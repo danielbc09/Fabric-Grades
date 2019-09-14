@@ -1,0 +1,81 @@
+version: '2'
+
+networks:
+    fabric:
+
+services:
+    caDecsai:
+        image: hyperledger/fabric-ca
+        environment:
+            - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+            - FABRIC_CA_SERVER_CA_NAME=caDecsai
+            - FABRIC_CA_SERVER_TLS_ENABLED=false
+            - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.decsai.ugr.es-cert.pem
+            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA_DECSAI_PRIVATE_KEY
+        ports:
+            - "7054:7054"
+        command: sh -c 'fabric-ca-server start -b admin:adminpw'
+        volumes:
+            - ../crypto-config/peerOrganizations/decsai.ugr.es/ca/:/etc/hyperledger/fabric-ca-server-config
+        container_name: ca_peerDecsai
+
+    peer0.decsai.ugr.es:
+        extends:
+            file: docker-compose-base.yml
+            service: peer
+        container_name: peer0.decsai.ugr.es
+        environment:
+            - CORE_PEER_CHAINCODELISTENADDRESS=peer0.decsai.ugr.es:7052
+            - CORE_PEER_ID=peer0.decsai.ugr.es
+            - CORE_PEER_ADDRESS=peer0.decsai.ugr.es:7051
+            - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.decsai.ugr.es:7051
+            - CORE_PEER_GOSSIP_ORGLEADER=false
+            - CORE_PEER_GOSSIP_USELEADERELECTION=true
+            - CORE_PEER_LOCALMSPID=decsaiMSP
+            - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/var/hyperledger/users/Admin@decsai.ugr.es/tls/ca.crt
+            - CORE_PEER_TLS_CLIENTCERT_FILE=/var/hyperledger/users/Admin@decsai.ugr.es/tls/client.crt
+            - CORE_PEER_TLS_CLIENTKEY_FILE=/var/hyperledger/users/Admin@decsai.ugr.es/tls/client.key
+        volumes:
+            - ../crypto-config/peerOrganizations/decsai.ugr.es/peers/peer0.decsai.ugr.es/msp:/var/hyperledger/msp
+            - ../crypto-config/peerOrganizations/decsai.ugr.es/peers/peer0.decsai.ugr.es/tls:/var/hyperledger/tls
+            - ../crypto-config/peerOrganizations/decsai.ugr.es/users:/var/hyperledger/users
+            - ../channel-artifacts/:/var/hyperledger/configs
+        extra_hosts:
+            - "orderer.etsiit.ugr.es:192.168.56.220"
+            - "peer0.atc.ugr.es:192.168.56.221"
+            - "peer0.audit.ugr.es:192.168.56.223"
+        networks:
+          fabric:
+             aliases:
+               - fabric
+        ports:
+          - 7051:7051
+          - 7053:7053
+
+    cli:
+        container_name: cli
+        image: hyperledger/fabric-tools
+        tty: true
+        environment:
+          - GOPATH=/opt/gopath
+          - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+          - CORE_LOGGING_LEVEL=DEBUG
+          - CORE_PEER_ID=cli
+          - CORE_PEER_ADDRESS=peer0.decsai.ugr.es:7051
+          - CORE_PEER_LOCALMSPID=decsaiMSP
+          - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/decsai.ugr.es/users/Admin@decsai.ugr.es/msp
+          - CORE_CHAINCODE_KEEPALIVE=10
+        extra_hosts:
+          - "orderer.etsiit.ugr.es:192.168.56.220"
+        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+        command: /bin/bash
+        volumes:
+            - /var/run/:/host/var/run/
+            - ../../chaincode/:/opt/gopath/src/github.com/chaincode
+            - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+            - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+            - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/
+        depends_on:
+          - peer0.decsai.ugr.es
+        networks:
+            - fabric

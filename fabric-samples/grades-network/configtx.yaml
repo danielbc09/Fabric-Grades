@@ -1,0 +1,77 @@
+---
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: ./crypto-config/ordererOrganizations/etsiit.ugr.es/msp
+
+    - &atc
+        Name: atcMSP
+        ID: atcMSP
+        MSPDir: ./crypto-config/peerOrganizations/atc.ugr.es/msp
+
+    - &decsai
+        Name: decsaiMSP
+        ID: decsaiMSP
+        MSPDir: ./crypto-config/peerOrganizations/decsai.ugr.es/msp
+    
+    - &audit
+        Name: auditMSP
+        ID: auditMSP
+        MSPDir: ./crypto-config/peerOrganizations/audit.ugr.es/msp
+
+
+Orderer: &OrdererDefaults
+
+    OrdererType: solo
+    Addresses:
+        - orderer.etsiit.ugr.es:7050
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+    Organizations:
+
+Application: &ApplicationDefaults
+    Organizations:
+
+Profiles:
+
+    FourOrgsOrdererGenesis:
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *atc
+                    - *decsai
+                    - *audit
+    ChannelAll:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *atc
+                - *decsai
+                - *audit
+    
+    Channelatc:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *atc
+    
+    Channeldecsai:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *decsai

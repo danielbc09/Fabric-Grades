@@ -1,0 +1,76 @@
+{
+    "name": "atc Client",
+    "version": "1.0",
+    "client": {
+      "organization": "atc"
+    },
+    "channels": {
+      "channelall": {
+        "orderers": [
+          "orderer.etsiit.ugr.es"
+        ],
+        "peers": {
+          "peer0.atc.ugr.es": {
+          },
+          "peer0.decsai.ugr.es": {
+          },
+          "peer0.audit.ugr.es": {
+          }
+        }
+      },
+      "channelatc": {
+        "orderers": [
+          "orderer.etsiit.ugr.es"
+        ],
+        "peers": {
+          "peer0.atc.ugr.es": {
+          }
+        }
+      }
+    },
+    "organizations": {
+      "atc": {
+        "mspid": "atcMSP",
+        "peers": [
+          "peer0.atc.ugr.es"
+        ],
+        "certificateAuthorities": [
+          "ca.atc.ugr.es"
+        ]
+      }
+    },
+    "orderers": {
+      "orderer.etsiit.ugr.es": {
+        "url": "grpc://192.168.56.220:7050",
+        "grpcOptions": {
+          "ssl-target-name-override": "orderer.etsiit.ugr.es",
+          "grpc-max-send-message-length": 5000
+        }
+      }
+    },
+    "peers": {
+      "peer0.atc.ugr.es": {
+        "url": "grpc://localhost:7051",
+        "eventUrl": "grpc://localhost:7053",
+        "grpcOptions": {
+          "ssl-target-name-override": "peer0.atc.ugr.es",
+          "grpc.keepalive_time_ms": 600000
+        }
+      }
+    },
+    "certificateAuthorities": {
+      "ca.atc.ugr.es": {
+        "url": "http://localhost:7054",
+        "httpOptions": {
+          "verify": false
+        },
+        "registrar": [
+          {
+            "enrollId": "admin",
+            "enrollSecret": "adminpw"
+          }
+        ],
+        "caName": "caATC"
+      }
+    }
+  }

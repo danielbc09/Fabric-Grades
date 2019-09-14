@@ -1,0 +1,19 @@
+{
+  "name": "grades-api",
+  "version": "1.0.0",
+  "description": "Aplicacioón para el servicio de registro y validación de notas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Daniel Bautista Castro",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "fabric-ca-client": "^1.4.4",
+    "fabric-network": "^1.4.4"
+  }
+}

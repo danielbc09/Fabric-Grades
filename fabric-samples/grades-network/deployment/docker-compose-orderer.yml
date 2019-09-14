@@ -1,0 +1,28 @@
+version: '2'
+
+networks:
+    ugr:
+
+services:
+
+    orderer.etsiit.ugr.es:
+        extends:
+            file: docker-compose-base.yml
+            service: orderer
+        container_name: orderer.etsiit.ugr.es
+        environment:
+            - ORDERER_HOST=orderer.etsiit.ugr.es
+        extra_hosts:
+            - "peer0.atc.ugr.es:192.168.56.221"
+            - "peer0.decsai.ugr.es:192.168.56.222"
+            - "peer0.audit.ugr.es:192.168.56.223"          
+        volumes:
+            - ../crypto-config/ordererOrganizations/etsiit.ugr.es/orderers/orderer.etsiit.ugr.es/msp:/var/hyperledger/msp
+            - ../crypto-config/ordererOrganizations/etsiit.ugr.es/orderers/orderer.etsiit.ugr.es/tls:/var/hyperledger/tls
+            - ../channel-artifacts/:/var/hyperledger/configs
+        networks:
+          ugr:
+             aliases:
+               - ugr
+        ports:
+          - 7050:7050

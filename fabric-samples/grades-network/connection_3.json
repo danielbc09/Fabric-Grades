@@ -1,0 +1,67 @@
+{
+    "name": "audit Client",
+    "version": "1.0",
+    "client": {
+      "organization": "audit"
+    },
+    "channels": {
+      "channelall": {
+        "orderers": [
+          "orderer.etsiit.ugr"
+        ],
+        "peers": {
+          "peer0.audit.etsiit.ugr": {
+            "endorsingPeer": true,
+            "chaincodeQuery": true,
+            "ledgerQuery": true,
+            "eventSource": true
+          }
+        }
+      }
+    },
+    "organizations": {
+      "audit": {
+        "mspid": "auditMSP",
+        "peers": [
+          "peer0.audit.etsiit.ugr"
+        ],
+        "certificateAuthorities": [
+          "ca.audit.etsiit.ugr"
+        ]
+      }
+    },
+    "orderers": {
+      "orderer.etsiit.ugr": {
+        "url": "grpc://192.168.56.220:7050",
+        "grpcOptions": {
+          "ssl-target-name-override": "orderer.etsiit.ugr",
+          "grpc-max-send-message-length": 5000
+        }
+      }
+    },
+    "peers": {
+      "peer0.audit.etsiit.ugr": {
+        "url": "grpc://localhost:7051",
+        "eventUrl": "grpc://localhost:7053",
+        "grpcOptions": {
+          "ssl-target-name-override": "peer0.audit.etsiit.ugr",
+          "grpc.keepalive_time_ms": 600000
+        }
+      }
+    },
+    "certificateAuthorities": {
+      "ca.audit.etsiit.ugr": {
+        "url": "http://localhost:7054",
+        "httpOptions": {
+          "verify": false
+        },
+        "registrar": [
+          {
+            "enrollId": "admin",
+            "enrollSecret": "adminpw"
+          }
+        ],
+        "caName": "caAUDIT"
+      }
+    }
+  }
